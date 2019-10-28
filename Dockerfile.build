@@ -1,0 +1,17 @@
+FROM node:12
+
+ARG APP_PATH=/usr/share/nodejs-proxy
+
+ENV NODE_ENV production
+
+WORKDIR ${APP_PATH}
+
+ADD . ${APP_PATH}
+
+RUN yarn install --production=false
+
+RUN yarn build
+
+RUN yarn install --production=true
+
+CMD ["node", "build/src/app.js"]

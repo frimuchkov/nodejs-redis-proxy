@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - ${PORT:-8080}:80
+    environment:
+      UPSTREAMS: proxy:8080
+    networks:
+      - backend
+    depends_on:
+      - proxy
+
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      PORT: 8080
+    networks:
+      - backend
+    volumes:
+      - .:/usr/share/nodejs-proxy
+    working_dir: /usr/share/nodejs-proxy
+    depends_on:
+      - redis
+    command: yarn start
+    ports:
+      - 8081:8080
+
+  redis:
+    image: redis:5
+    volumes:
+      - "redis-data:/data"
+    ports:
+      - 6379:6379
+    networks:
+      - backend
+
+volumes:
+  redis-data:
+
+networks:
+  backend:
