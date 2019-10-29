@@ -8,7 +8,9 @@
   "scripts": {
     "build": "rm -rf build && tsc",
     "start": "node ./build/src/index.js",
-    "test": "nyc --extension=.ts --extension=.js mocha --require ts-node/register --recursive \"test/**/*.test.ts\""
+    "fill_redis": "node ./build/utils/fillRedis.js",
+    "get_values_from_api": "PORT=8080 node ./build/utils/getValuesViaApi.js",
+    "test": "NODE_ENV=test nyc --extension=.ts --extension=.js mocha --require ts-node/register --recursive \"test/**/*.test.ts\" --exit"
   },
   "repository": {
     "type": "git",
@@ -17,10 +19,12 @@
   "dependencies": {
     "config": "^3.2.4",
     "express": "^4.17.1",
-    "redis": "^2.8.0"
+    "redis": "^2.8.0",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
+    "@types/chai-spies": "^1.0.1",
     "@types/config": "^0.0.35",
     "@types/express": "^4.17.1",
     "@types/mocha": "^5.2.0",
@@ -28,6 +32,7 @@
     "@types/redis": "^2.8.14",
     "@types/request-promise-native": "^1.0.17",
     "chai": "^4.2.0",
+    "chai-spies": "^1.0.0",
     "mocha": "^5.2.0",
     "mocha-teamcity-reporter": "^2.5.1",
     "nyc": "^14.1.1",

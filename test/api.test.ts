@@ -20,7 +20,7 @@ describe('Api tests', () => {
           .all((new Array(10).fill(1)
           .map(((value, index) => {
                 return new Promise(resolve =>
-                  redisInstance
+                  (redisInstance as any)
                     .connection
                     .set(`key_${index}`, `value_${index}`, () => resolve()));
             })
@@ -34,7 +34,7 @@ describe('Api tests', () => {
         });
 
         it ('Should return value from cache', async () => {
-            redisInstance.cache.list.add('key_1', {
+            (redisInstance as any).cache.list.add('key_1', {
                 expiredTime: Date.now() + 10000,
                 value: 'value_from_cache',
             });
@@ -72,10 +72,10 @@ describe('Api tests', () => {
     });
 
     after(('Flush redis'), async () => {
-        await new Promise(resolve => redisInstance
+        await new Promise(resolve => (redisInstance as any)
           .connection.flushall(() => resolve()));
 
-        await new Promise(resolve => redisInstance.connection.quit(() => resolve()));
+        await new Promise(resolve => (redisInstance as any).connection.quit(() => resolve()));
         (redisInstance as any).connection = undefined;
     });
 });

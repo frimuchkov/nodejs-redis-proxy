@@ -28,9 +28,9 @@ function connectToRedisBeforeCall(
 
 
 class Redis {
-    connection: RedisClient;
+    private connection: RedisClient;
     connectData: RedisConnectionOptions;
-    cache: LruCache<string>;
+    private cache: LruCache<string>;
     constructor() {
         const opts = config.get<Omit<RedisConnectionOptions, 'port'> & { port: string }>('connections.redis');
         this.connectData = {

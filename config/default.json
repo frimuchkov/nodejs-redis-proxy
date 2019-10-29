@@ -1,9 +1,10 @@
 {
   "appPort": "3000",
+  "maxParallelRequests": "1",
   "connections": {
     "redis": {
       "database": "0",
-      "host": "localhost",
+      "host": "redis",
       "port": "6379"
     }
   },

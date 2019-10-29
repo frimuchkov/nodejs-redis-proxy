@@ -9,12 +9,23 @@ class DoublyLinkedListElement<T extends any> {
     }
 }
 
-export class DoublyLinkedList<T extends any> {
-    size: number = 0;
-    head: DoublyLinkedListElement<T> | undefined;
-    tail: DoublyLinkedListElement<T> | undefined;
-    keyMap: {[key: string]: DoublyLinkedListElement<T>} = {};
+export class DoublyLinkedListWithMap<T extends any> {
+    private size: number = 0;
+    private head: DoublyLinkedListElement<T> | undefined;
+    private tail: DoublyLinkedListElement<T> | undefined;
+    private keyMap: {[key: string]: DoublyLinkedListElement<T>} = {};
 
+    getSize() {
+        return this.size;
+    }
+
+    getTail() {
+        return this.tail;
+    }
+
+    getHead() {
+        return this.head;
+    }
 
     private removeFromChain(element: DoublyLinkedListElement<T>) {
         if (element.previous) {
@@ -110,7 +121,7 @@ interface LruValue<T> {
 export class LruCache<T extends any> {
     capacity: number = 0;
     ttl: number = 0;
-    list: DoublyLinkedList<LruValue<T>>;
+    list: DoublyLinkedListWithMap<LruValue<T>>;
     /**
      *
      * @param capacity
@@ -119,7 +130,7 @@ export class LruCache<T extends any> {
     constructor(capacity: number = 10, ttl: number = 1000) {
         this.capacity = capacity;
         this.ttl = ttl;
-        this.list = new DoublyLinkedList<LruValue<T>>();
+        this.list = new DoublyLinkedListWithMap<LruValue<T>>();
     }
 
     get(key: string): T | null {
@@ -142,7 +153,7 @@ export class LruCache<T extends any> {
         }
 
         this.list.remove(key);
-        if (this.list.size === this.capacity) {
+        if (this.list.getSize() === this.capacity) {
             this.list.removeTailElement();
         }
         this.list.add(key, {

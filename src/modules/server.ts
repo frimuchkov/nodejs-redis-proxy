@@ -5,21 +5,36 @@ import { Server } from 'http';
 import logger from "../libs/logger";
 import * as http from "http";
 import redisInstance from "./redisClient";
+import { RequestQueueManager } from "./requestQueueManager";
 
 class HttpServer {
   private server: http.Server | undefined;
+  private requestQueueManager: RequestQueueManager;
+
+  constructor() {
+    this.requestQueueManager = new RequestQueueManager(Number(config.get<string>('maxParallelRequests')));
+  }
+
+
   async init(): Promise<Server> {
     const app = express();
     app.use('/:key', async (req: Request, res: Response, next: NextFunction) => {
-      if (req.params.key != null) {
-        const value = await redisInstance.get(req.params.key);
-        if (value == null) {
-          return res.sendStatus(404);
+      this.requestQueueManager.executeRequest(async() => {
+        try {
+          if (req.params.key != null) {
+            const value = await redisInstance.get(req.params.key);
+            if (value == null) {
+              return res.sendStatus(404);
+            }
+            res.send(value);
+          } else {
+            next();
+          }
+        } catch (e) {
+          logger.error(`Error while process request with key ${req.params.key}`, e);
+          return res.sendStatus(500);
         }
-        res.send(value);
-      } else {
-        next();
-      }
+      });
     });
 
     app.use((req: Request, res: Response) => {

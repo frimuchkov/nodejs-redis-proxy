@@ -1,0 +1,7 @@
+{
+  "connections": {
+    "redis": {
+      "host": "localhost"
+    }
+  }
+}
