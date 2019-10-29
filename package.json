@@ -8,7 +8,7 @@
   "scripts": {
     "build": "rm -rf dist && tsc",
     "start": "node ./dist/src/index.js",
-    "test": "mocha --require ts-node/register --recursive \"test/**/*.test.ts\" --exit"
+    "test": "nyc --extension=.ts --extension=.js mocha --require ts-node/register --recursive \"test/**/*.test.ts\" --exit"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,7 @@
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
     "mocha-teamcity-reporter": "^2.5.1",
+    "nyc": "^14.1.1",
     "pre-commit": "^1.2.2",
     "ts-node": "^7.0.1",
     "typescript": "^3.2.2"

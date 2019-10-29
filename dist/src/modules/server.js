@@ -3,12 +3,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const config = require("config");
 const express = require("express");
 const logger_1 = require("../libs/logger");
+const redisClient_1 = require("./redisClient");
 class HttpServer {
     async init() {
         const app = express();
-        app.use('/:key', (req, res, next) => {
+        app.use('/:key', async (req, res, next) => {
             if (req.params.key != null) {
-                res.send({ key: req.params.key });
+                const value = await redisClient_1.default.get(req.params.key);
+                if (value == null) {
+                    return res.sendStatus(404);
+                }
+                res.send(value);
+            }
+            else {
+                next();
             }
         });
         app.use((req, res, next) => {

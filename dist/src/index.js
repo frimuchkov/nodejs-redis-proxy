@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+require("reflect-metadata");
 const logger_1 = require("./libs/logger");
 const server_1 = require("./modules/server");
 const start = async () => {
