@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import logger from "./libs/logger";
 import HttpServer from "./modules/server";
 

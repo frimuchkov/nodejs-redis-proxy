@@ -4,13 +4,20 @@ import { NextFunction, Request, Response } from 'express';
 import { Server } from 'http';
 import logger from "../libs/logger";
 import * as http from "http";
+import redisInstance from "./redisClient";
 
 class HttpServer {
   async init(): Promise<Server> {
     const app = express();
-    app.use('/:key', (req: Request, res: Response, next: NextFunction) => {
+    app.use('/:key', async (req: Request, res: Response, next: NextFunction) => {
       if (req.params.key != null) {
-        res.send({ key: req.params.key })
+        const value = await redisInstance.get(req.params.key);
+        if (value == null) {
+          return res.sendStatus(404);
+        }
+        res.send(value);
+      } else {
+        next();
       }
     });
 

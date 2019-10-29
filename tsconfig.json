@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
+      "experimentalDecorators": true,
     "outDir": "./dist/",       // path to output directory
     "sourceMap": true,          // allow sourcemap support
     "allowJs": false,           // allow a partial TypeScript and JavaScript codebase,
     // strict without alwaysStrict
     "noImplicitThis": true,
-    "strictPropertyInitialization": true,
+    "strictPropertyInitialization": false,
     "strictNullChecks": true,
     "noImplicitAny": true,
     "strictBindCallApply": true,
