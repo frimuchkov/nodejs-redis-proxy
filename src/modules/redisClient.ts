@@ -52,17 +52,17 @@ class Redis {
         this.connection = connection;
         return new Promise((resolve, reject) => {
             connection.on('error', (err) => {
-                logger.error(`Error in REDIS.${name}:`, err);
+                logger.error(`Error in Redis:`, err);
                 return reject(err);
             });
 
             connection.on('connect', () => {
-                logger.info(`Connect to REDIS.${name}: http://${this.connectData.host}:${this.connectData.port
+                logger.info(`Connect to Redis: http://${this.connectData.host}:${this.connectData.port
                     }, database: ${this.connectData.database}`);
                 resolve(connection);
             });
             connection.on('disconnect', () => {
-                logger.info(`Disconnect from REDIS.${name}: http://${this.connectData.host}:${this.connectData.port
+                logger.info(`Disconnect from Redis: http://${this.connectData.host}:${this.connectData.port
                 }, database: ${this.connectData.database}`);
             });
         });

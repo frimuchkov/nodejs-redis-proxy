@@ -1,5 +1,5 @@
 {
-  "appPort": "8080",
+  "appPort": "3000",
   "connections": {
     "redis": {
       "database": "0",

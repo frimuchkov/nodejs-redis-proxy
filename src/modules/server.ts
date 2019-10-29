@@ -7,6 +7,7 @@ import * as http from "http";
 import redisInstance from "./redisClient";
 
 class HttpServer {
+  private server: http.Server | undefined;
   async init(): Promise<Server> {
     const app = express();
     app.use('/:key', async (req: Request, res: Response, next: NextFunction) => {
@@ -21,7 +22,7 @@ class HttpServer {
       }
     });
 
-    app.use((req: Request, res: Response, next: NextFunction) => {
+    app.use((req: Request, res: Response) => {
       res.sendStatus(404);
     });
 
@@ -29,10 +30,9 @@ class HttpServer {
     const appPort = Number(config.get<string>('appPort'));
     return new Promise((resolve, reject) => {
       try {
-        let server: http.Server;
-        server = app.listen(appPort, () => {
+        this.server = app.listen(appPort, () => {
           logger.info(`Server created on port ${appPort}`);
-          resolve(server);
+          resolve(this.server);
         });
       } catch (err) {
         logger.error(`Server can't be created on port ${appPort}`);
@@ -42,6 +42,16 @@ class HttpServer {
         logger.error(`Server can't be created on port ${appPort}`);
         reject(err);
       });
+    });
+  }
+
+  async stop(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.server) {
+        reject('No server init');
+        return;
+      }
+      this.server.close(() => resolve());
     });
   }
 }

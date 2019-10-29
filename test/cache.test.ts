@@ -124,6 +124,11 @@ describe('Cache tests', () => {
 
             list.remove('unExistent');
             expect(list.size).to.be.eq(1);
+
+            list.remove(testKeys[0]);
+            expect(list.size).to.be.eq(0);
+            list.removeHeadElement();
+            list.removeTailElement();
         });
 
         it ('Should lift tail', () => {
@@ -179,12 +184,6 @@ describe('Cache tests', () => {
     describe ('LRU cache', () => {
         const testKeys = ['key1', 'key2', 'key3'];
         const testValues = ['value1', 'value2', 'value3'];
-        it ('Should add element', () => {
-            const cache = new LruCache<string>();
-            cache.set(testKeys[0], testValues[0]);
-            expect(cache.get(testKeys[0])).to.be.eq(testValues[0]);
-        });
-
         it ('Should add element', () => {
             const cache = new LruCache<string>();
             cache.set(testKeys[0], testValues[0]);
