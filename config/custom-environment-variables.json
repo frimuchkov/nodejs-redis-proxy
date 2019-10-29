@@ -1,3 +1,14 @@
 {
-  "appPort": "PORT"
+  "appPort": "PORT",
+  "connections": {
+    "redis": {
+      "database": "REDIS_DATABASE",
+      "host": "REDIS_HOST",
+      "port": "REDIS_PORT"
+    }
+  },
+  "cache": {
+    "capacity": "CACHE_CAPACITY",
+    "ttl": "CACHE_TTL"
+  }
 }
