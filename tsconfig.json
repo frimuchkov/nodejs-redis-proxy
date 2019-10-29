@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
       "experimentalDecorators": true,
-    "outDir": "./dist/",       // path to output directory
+    "outDir": "./build/",       // path to output directory
     "sourceMap": true,          // allow sourcemap support
     "allowJs": false,           // allow a partial TypeScript and JavaScript codebase,
     // strict without alwaysStrict
@@ -25,7 +25,7 @@
   },
   "exclude": [
     "node_modules",
-    "dist"
+    "build"
   ],
   "include": [
     "./src/",

@@ -6,8 +6,8 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "scripts": {
-    "build": "rm -rf dist && tsc",
-    "start": "node ./dist/src/index.js",
+    "build": "rm -rf build && tsc",
+    "start": "node ./build/src/index.js",
     "test": "nyc --extension=.ts --extension=.js mocha --require ts-node/register --recursive \"test/**/*.test.ts\" --exit"
   },
   "repository": {
