@@ -13,10 +13,10 @@ If you need to run tests just execute `make test` (don't forget stop development
 
 ## Documentation
 ### High-level architecture overview
-![alt text](https://raw.githubusercontent.com/frimuchkov/nodejs-redis-proxy/master/architecture.png)
+![alt text](./architecture.png)
 
 ### Components architecture overview
-![alt text](https://raw.githubusercontent.com/frimuchkov/nodejs-redis-proxy/master/appArchitecture.png)
+![alt text](./appArchitecture.png)
 
 ### What the code does
 * Listen port
