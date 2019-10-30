@@ -6,7 +6,7 @@ services:
       context: ./nginx
       dockerfile: Dockerfile
     ports:
-      - ${PORT:-8080}:80
+      - 8080:80
     environment:
       UPSTREAMS: proxy:3000
     networks:

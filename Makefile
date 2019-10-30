@@ -3,9 +3,16 @@
 test:
 	docker-compose down -v
 	docker-compose up -d --build
-	sleep 5
-	docker-compose exec -T proxy yarn test
+	docker-compose run --rm proxy yarn test
 	docker-compose down -v
+
+start:
+	docker-compose down -v
+	docker-compose up -d --build
+
+stop:
+	docker-compose down -v
+	docker-compose up -d --build
 
 fillRedis:
 	docker-compose up -d

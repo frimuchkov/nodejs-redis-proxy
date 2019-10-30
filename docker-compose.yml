@@ -20,13 +20,13 @@ services:
       dockerfile: Dockerfile.build
     environment:
       PORT: 3000
-      MAX_PARALLEL_REQUESTS: 1
-      MAX_CONNECTIONS: 10
-      REDIS_DATABASE: 0
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      CACHE_CAPACITY: 100
-      CACHE_TTL: 10000
+      MAX_PARALLEL_REQUESTS: ${PORT:-1}
+      MAX_CONNECTIONS: ${PORT:-10}
+      REDIS_DATABASE: ${PORT:-0}
+      REDIS_HOST: ${PORT:-redis}
+      REDIS_PORT: ${PORT:-6379}
+      CACHE_CAPACITY: ${PORT:-100}
+      CACHE_TTL: ${PORT:-10000}
     networks:
       - backend
     depends_on:

@@ -34,7 +34,7 @@ If you need to run tests just execute `make test` (don't forget stop development
 * There is no list crawling operations
 * Complexity of add element to list is a constant
 * Complexity of remove element from list is a constant
-* Complexity of accessing to object value is a constant
+* Complexity of accessing to object value is a constant <br />
 So, algorithmic complexity of the cache operations is `O(1)`.
 
 ### Instructions for how to run the proxy and tests.
@@ -42,6 +42,8 @@ For tests and common usage use `docker-compose up -d`, `docker-compose -f docker
 * `make test` - run tests
 * `make fillRedis` - run proxy in docker and fill redis by values (`key_1`, `key_2`, etc.)
 * `make getValuesFromApi key_1 key_2` - run proxy in docker  get values from redis via api
+* `make start` - start proxy on 3000 port (configure store in `.env` file)
+* `make stop` - stop proxy
 
 ### How long you spent on each part of the project.
 * Architecture scheme `30m`
