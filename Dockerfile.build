@@ -12,6 +12,4 @@ RUN yarn install --production=false
 
 RUN yarn build
 
-RUN yarn install --production=true
-
-CMD ["node", "build/src/app.js"]
+CMD ["node", "build/src/index.js"]

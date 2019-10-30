@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import logger from "./libs/logger";
-import HttpServer from "./modules/server";
+import logger from './libs/logger';
+import HttpServer from './modules/server';
 
 const start = async () => {
   const server = new HttpServer();

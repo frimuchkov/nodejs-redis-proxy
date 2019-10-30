@@ -17,7 +17,7 @@ services:
   proxy:
     build:
       context: .
-      dockerfile: Dockerfile.build
+      dockerfile: Dockerfile.dev
     environment:
       PORT: 3000
       MAX_PARALLEL_REQUESTS: 1
@@ -29,8 +29,12 @@ services:
       CACHE_TTL: 10000
     networks:
       - backend
+    volumes:
+      - .:/usr/share/nodejs-proxy
+    working_dir: /usr/share/nodejs-proxy
     depends_on:
       - redis
+    command: yarn start
     ports:
       - 8081:3000
 

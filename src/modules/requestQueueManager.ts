@@ -1,5 +1,6 @@
-import { DoublyLinkedListWithMap } from "./lruCache";
-import logger from "../libs/logger";
+import { DoublyLinkedListWithMap } from './lruCache';
+import logger from '../libs/logger';
+import { ProxyErrors } from '../libs/proxyErrors';
 
 interface QueueFn {
   (): any
@@ -7,11 +8,13 @@ interface QueueFn {
 
 export class RequestQueueManager {
   maxParallelRequests: number;
+  maxRequests: number;
   private currentRunning: number = 0;
   private list: DoublyLinkedListWithMap<QueueFn>;
 
-  constructor(maxParallelRequests: number) {
+  constructor(maxParallelRequests: number, maxRequests: number) {
     this.maxParallelRequests = maxParallelRequests;
+    this.maxRequests = maxRequests;
     this.list = new DoublyLinkedListWithMap<QueueFn>()
   }
 
@@ -24,6 +27,9 @@ export class RequestQueueManager {
   }
 
   executeRequest(fn: QueueFn) {
+    if (this.getActive() + this.getQueue() >= this.maxRequests) {
+      throw new Error(ProxyErrors.MAX_CONNECTIONS_EXCEEDED);
+    }
     // https://jsperf.com/node-uuid-vs-math-random
     // It seems to collision is not real case
     const randomId = (`${Date.now()}${(Math.random() * 100000000).toFixed()}`).toString();
@@ -40,7 +46,7 @@ export class RequestQueueManager {
       }
       this.end();
     });
-    this.callNext();
+    setImmediate(() => this.callNext());
   }
 
   private end() {

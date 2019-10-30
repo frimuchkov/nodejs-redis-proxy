@@ -9,7 +9,7 @@
     "build": "rm -rf build && tsc",
     "start": "node ./build/src/index.js",
     "fill_redis": "node ./build/utils/fillRedis.js",
-    "get_values_from_api": "PORT=8080 node ./build/utils/getValuesViaApi.js",
+    "get_values_from_api": "node ./build/utils/getValuesViaApi.js",
     "test": "NODE_ENV=test nyc --extension=.ts --extension=.js mocha --require ts-node/register --recursive \"test/**/*.test.ts\" --exit"
   },
   "repository": {

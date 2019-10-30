@@ -1,6 +1,6 @@
 import * as config from 'config';
-import * as rp from "request-promise-native";
-import logger from "../src/libs/logger";
+import * as rp from 'request-promise-native';
+import logger from '../src/libs/logger';
 
 const url = `http://localhost:${Number(config.get<string>('appPort'))}`;
 

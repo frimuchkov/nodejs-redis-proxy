@@ -1,6 +1,7 @@
 {
   "appPort": "PORT",
   "maxParallelRequests": "MAX_PARALLEL_REQUESTS",
+  "maxConnections": "MAX_CONNECTIONS",
   "connections": {
     "redis": {
       "database": "REDIS_DATABASE",

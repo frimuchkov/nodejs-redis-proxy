@@ -1,5 +1,5 @@
-import redisInstance from "../src/modules/redisClient";
-import logger from "../src/libs/logger";
+import redisInstance from '../src/modules/redisClient';
+import logger from '../src/libs/logger';
 
 const fillRedis = async () => {
   await redisInstance.connect();

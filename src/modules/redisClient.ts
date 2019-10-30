@@ -1,8 +1,8 @@
 import * as redis from 'redis';
-import {RedisClient} from 'redis';
+import { RedisClient } from 'redis';
 import * as config from 'config';
 import logger from '../libs/logger';
-import {LruCache} from "./lruCache";
+import { LruCache } from './lruCache';
 
 interface RedisConnectionOptions {
     database: string;

@@ -1,5 +1,5 @@
 import { expect, assert } from 'chai';
-import {DoublyLinkedListWithMap, LruCache} from "../src/modules/lruCache";
+import {DoublyLinkedListWithMap, LruCache} from '../src/modules/lruCache';
 
 
 describe('Cache tests', () => {

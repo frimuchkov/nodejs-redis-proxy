@@ -1,8 +1,8 @@
-import * as rp from "request-promise-native";
+import * as rp from 'request-promise-native';
 import * as config from 'config';
 import { expect } from 'chai';
-import HttpServer from "../src/modules/server";
-import redisInstance from "../src/modules/redisClient";
+import HttpServer from '../src/modules/server';
+import redisInstance from '../src/modules/redisClient';
 
 
 const url = `http://localhost:${Number(config.get<string>('appPort'))}`;

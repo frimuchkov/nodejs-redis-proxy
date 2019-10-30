@@ -1,7 +1,8 @@
 import * as chai from 'chai';
 import chaiSpies = require('chai-spies');
-import {RequestQueueManager} from "../src/modules/requestQueueManager";
-import logger from "../src/libs/logger";
+import {RequestQueueManager} from '../src/modules/requestQueueManager';
+import logger from '../src/libs/logger';
+import {ProxyErrors} from '../src/libs/proxyErrors';
 
 chai.use(chaiSpies);
 
@@ -10,14 +11,14 @@ const { expect } = chai;
 
 describe('Requests queue manager tests', () => {
   it ('Should process sync task', (done) => {
-    const queueManager = new RequestQueueManager(1);
+    const queueManager = new RequestQueueManager(1, 10);
     queueManager.executeRequest(() => {
       done();
     });
   });
 
   it ('Should process async task', (done) => {
-    const queueManager = new RequestQueueManager(1);
+    const queueManager = new RequestQueueManager(1, 10);
     queueManager.executeRequest(async () => {
       await new Promise(resolve => setTimeout((resolve), 10));
       done();
@@ -33,20 +34,21 @@ describe('Requests queue manager tests', () => {
     });
 
 
-    it ('Should catch sync error', () => {
+    it ('Should catch sync error', async () => {
       const spy = chai.spy();
       call = spy;
-      const queueManager = new RequestQueueManager(1);
+      const queueManager = new RequestQueueManager(1, 10);
       queueManager.executeRequest(() => {
         throw new Error();
       });
+      await new Promise(resolve => setTimeout((resolve), 50));
       expect(spy).have.been.called.exactly(1);
     });
 
     it ('Should catch async error', async () => {
       const spy = chai.spy();
       call = spy;
-      const queueManager = new RequestQueueManager(1);
+      const queueManager = new RequestQueueManager(1, 10);
       queueManager.executeRequest(async () => {
         await new Promise((resolve, reject) => setTimeout(() => reject('Some error'), 10));
       });
@@ -61,7 +63,7 @@ describe('Requests queue manager tests', () => {
 
 
   it ('Should queue tasks', async () => {
-    const queueManager = new RequestQueueManager(2);
+    const queueManager = new RequestQueueManager(2, 10);
     const results: any[] = [];
 
     const tasksResolvers: (() => any)[] = [];
@@ -79,6 +81,8 @@ describe('Requests queue manager tests', () => {
       await new Promise(resolve => tasksResolvers.push(resolve));
       results.push(3);
     });
+
+    await new Promise(resolve => setTimeout((resolve), 1));
 
     expect(results.length).to.be.eq(0);
 
@@ -108,4 +112,15 @@ describe('Requests queue manager tests', () => {
     expect(queueManager.getActive()).to.be.eq(0);
   });
 
+  it ('Should throw error when exceeded max requests', async () => {
+    const queueManager = new RequestQueueManager(1, 1);
+    let resolver: () => void = () => {};
+    queueManager.executeRequest(async () => {
+      await new Promise(resolve => {
+        resolver = resolve;
+      })});
+
+    expect(() => queueManager.executeRequest(() => {})).to.throw(ProxyErrors.MAX_CONNECTIONS_EXCEEDED);
+    resolver();
+  });
 });

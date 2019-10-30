@@ -2,39 +2,51 @@ import * as config from 'config';
 import * as express from 'express';
 import { NextFunction, Request, Response } from 'express';
 import { Server } from 'http';
-import logger from "../libs/logger";
-import * as http from "http";
-import redisInstance from "./redisClient";
-import { RequestQueueManager } from "./requestQueueManager";
+import logger from '../libs/logger';
+import * as http from 'http';
+import redisInstance from './redisClient';
+import { RequestQueueManager } from './requestQueueManager';
+import { ProxyErrors } from '../libs/proxyErrors';
 
 class HttpServer {
   private server: http.Server | undefined;
   private requestQueueManager: RequestQueueManager;
 
   constructor() {
-    this.requestQueueManager = new RequestQueueManager(Number(config.get<string>('maxParallelRequests')));
+    this.requestQueueManager = new RequestQueueManager(
+        Number(config.get<string>('maxParallelRequests')),
+        Number(config.get<string>('maxConnections'))
+    );
   }
-
 
   async init(): Promise<Server> {
     const app = express();
     app.use('/:key', async (req: Request, res: Response, next: NextFunction) => {
-      this.requestQueueManager.executeRequest(async() => {
-        try {
-          if (req.params.key != null) {
-            const value = await redisInstance.get(req.params.key);
-            if (value == null) {
-              return res.sendStatus(404);
+      try {
+        this.requestQueueManager.executeRequest(async () => {
+          try {
+            if (req.params.key != null) {
+              const value = await redisInstance.get(req.params.key);
+              if (value == null) {
+                return res.sendStatus(404);
+              }
+              res.send(value);
+            } else {
+              next();
             }
-            res.send(value);
-          } else {
-            next();
+          } catch (e) {
+            logger.error(`Error while process request with key ${req.params.key}`, e);
+            return res.sendStatus(500);
           }
-        } catch (e) {
+        });
+      } catch (e) {
+        if (e.message === ProxyErrors.MAX_CONNECTIONS_EXCEEDED) {
+          return res.sendStatus(503);
+        } else {
           logger.error(`Error while process request with key ${req.params.key}`, e);
           return res.sendStatus(500);
         }
-      });
+      }
     });
 
     app.use((req: Request, res: Response) => {
