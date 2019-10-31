@@ -27,9 +27,8 @@ describe('Requests queue manager tests', () => {
 
   describe ('Tests catch errors', () => {
     let call: (...args: any[]) => any = () => {};
-    let loggerError: (...args: any[]) => any;
+    const loggerError = logger.error;
     before('Mock logger', () => {
-      loggerError = logger.error;
       logger.error = (...args: any[]) => call(...args);
     });
 
@@ -82,7 +81,7 @@ describe('Requests queue manager tests', () => {
       results.push(3);
     });
 
-    await new Promise(resolve => setTimeout((resolve), 1));
+    await new Promise(resolve => setTimeout((resolve), 5));
 
     expect(results.length).to.be.eq(0);
 
@@ -91,7 +90,7 @@ describe('Requests queue manager tests', () => {
 
     // Execute first
     tasksResolvers.shift()!();
-    await new Promise(resolve => setTimeout((resolve), 1));
+    await new Promise(resolve => setTimeout((resolve), 5));
     expect(results[0]).to.be.eq(1);
 
     expect(queueManager.getQueue()).to.be.eq(0);
@@ -99,14 +98,14 @@ describe('Requests queue manager tests', () => {
 
     // Execute second
     tasksResolvers.shift()!();
-    await new Promise(resolve => setTimeout((resolve), 1));
+    await new Promise(resolve => setTimeout((resolve), 5));
     expect(results[1]).to.be.eq(2);
     expect(queueManager.getQueue()).to.be.eq(0);
     expect(queueManager.getActive()).to.be.eq(1);
 
     // Execute third
     tasksResolvers.shift()!();
-    await new Promise(resolve => setTimeout((resolve), 1));
+    await new Promise(resolve => setTimeout((resolve), 5));
     expect(results[2]).to.be.eq(3);
     expect(queueManager.getQueue()).to.be.eq(0);
     expect(queueManager.getActive()).to.be.eq(0);

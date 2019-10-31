@@ -7,33 +7,50 @@ import * as http from 'http';
 import redisInstance from './redisClient';
 import { RequestQueueManager } from './requestQueueManager';
 import { ProxyErrors } from '../libs/proxyErrors';
+import {LruCache} from "./lruCache";
 
 class HttpServer {
   private server: http.Server | undefined;
   private requestQueueManager: RequestQueueManager;
+  private cache: LruCache<string>;
+  private readonly appPort: number;
 
   constructor() {
     this.requestQueueManager = new RequestQueueManager(
         Number(config.get<string>('maxParallelRequests')),
         Number(config.get<string>('maxConnections'))
     );
+
+    this.cache = new LruCache(
+      Number(config.get<string>('cache.capacity')),
+      Number(config.get<string>('cache.ttl')),
+    );
+
+    this.appPort = Number(config.get<string>('appPort'));
   }
 
   async init(): Promise<Server> {
+    if (this.server != null) {
+      return this.server;
+    }
     const app = express();
     app.use('/:key', async (req: Request, res: Response, next: NextFunction) => {
       try {
         this.requestQueueManager.executeRequest(async () => {
           try {
-            if (req.params.key != null) {
-              const value = await redisInstance.get(req.params.key);
-              if (value == null) {
-                return res.sendStatus(404);
+            const key = req.params.key;
+            let value = this.cache.get(key);
+            if (value == null) {
+              value = await redisInstance.get(key);
+              if (value != null) {
+                this.cache.set(key, value);
               }
-              res.send(value);
-            } else {
-              next();
             }
+
+            if (value == null) {
+              return res.sendStatus(404);
+            }
+            res.send(value);
           } catch (e) {
             logger.error(`Error while process request with key ${req.params.key}`, e);
             return res.sendStatus(500);
@@ -54,31 +71,34 @@ class HttpServer {
     });
 
 
-    const appPort = Number(config.get<string>('appPort'));
     return new Promise((resolve, reject) => {
       try {
-        this.server = app.listen(appPort, () => {
-          logger.info(`Server created on port ${appPort}`);
+        this.server = app.listen(this.appPort, () => {
+          logger.info(`Server created on port ${this.appPort}`);
           resolve(this.server);
+        }).on('error', (err) => {
+          logger.error(`Server can't be created on port ${this.appPort}`, err);
+          delete this.server;
+          reject(err);
         });
       } catch (err) {
-        logger.error(`Server can't be created on port ${appPort}`);
+        logger.error(`Error while server init, server can't be created on port ${this.appPort}`, err);
+        delete this.server;
         reject(err);
       }
-      app.on('error', (err) => {
-        logger.error(`Server can't be created on port ${appPort}`);
-        reject(err);
-      });
     });
   }
 
   async stop(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.server) {
-        reject('No server init');
+        reject(new Error('No server init'));
         return;
       }
-      this.server.close(() => resolve());
+      this.server.close(() => {
+        resolve();
+      });
+      delete this.server;
     });
   }
 }

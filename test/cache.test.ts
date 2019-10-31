@@ -201,7 +201,7 @@ describe('Cache tests', () => {
         it ('Should not give expired element', async () => {
             const cache = new LruCache<string>(10, 100);
             cache.set(testKeys[0], testValues[0]);
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 110));
             expect(cache.get(testKeys[0])).to.be.an('null');
         });
 

@@ -34,7 +34,7 @@ describe('Api tests', () => {
         });
 
         it ('Should return value from cache', async () => {
-            (redisInstance as any).cache.list.add('key_1', {
+            (server as any).cache.list.add('key_1', {
                 expiredTime: Date.now() + 10000,
                 value: 'value_from_cache',
             });
@@ -64,6 +64,80 @@ describe('Api tests', () => {
 
             );
             expect(result.statusCode).to.be.eq(404);
+        });
+
+
+        describe ('Exceed connections limit', () => {
+            before('Set max connections to 0' , () => {
+                (server as any).requestQueueManager.maxRequests = 0;
+            });
+
+            it ('Should return 503 when maximum connections exceeded', async () => {
+                const result = await rp.get(
+                  `${url}/key`,
+                  {
+                      resolveWithFullResponse: true,
+                      simple: false,
+                  }
+
+                );
+                expect(result.statusCode).to.be.eq(503);
+            });
+
+            after('Set max connections to default' , () => {
+                (server as any).requestQueueManager.maxRequests = Number(config.get<string>('maxConnections'));
+            });
+
+        });
+
+        describe ('Return 500 if something went wrong in request limiter', () => {
+            const executeRequest = (server as any).requestQueueManager.executeRequest.bind((server as any).requestQueueManager);
+            before('Mock request limiter', () => {
+                (server as any).requestQueueManager.executeRequest = () => {
+                    throw new Error('Request limiter error');
+                };
+            });
+
+            it ('Should return 500', async () => {
+                const result = await rp.get(
+                  `${url}/key`,
+                  {
+                      resolveWithFullResponse: true,
+                      simple: false,
+                  }
+
+                );
+                expect(result.statusCode).to.be.eq(500);
+            });
+
+            after('Restore request limiter' , () => {
+                (server as any).requestQueueManager.executeRequest = executeRequest;
+            });
+        });
+
+        describe ('Return 500 if something went wrong in async part', () => {
+            const cacheGet = (server as any).cache.get.bind((server as any).cache);
+            before('Mock cache', () => {
+                (server as any).cache.get = () => {
+                    throw new Error('Cache error');
+                };
+            });
+
+            it ('Should return 500', async () => {
+                const result = await rp.get(
+                  `${url}/key`,
+                  {
+                      resolveWithFullResponse: true,
+                      simple: false,
+                  }
+
+                );
+                expect(result.statusCode).to.be.eq(500);
+            });
+
+            after('Restore request limiter' , () => {
+                (server as any).cache.get.executeRequest = cacheGet;
+            });
         });
     });
 

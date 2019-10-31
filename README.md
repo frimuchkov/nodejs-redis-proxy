@@ -10,6 +10,7 @@ If you need to run tests just execute `make test` (don't forget stop development
 * Stop development containers (`docker-compose -f docker-compose.dev.yml down`) and execute `make test`
 * `make fillRedis` - fill redis by values (`key_1`, `key_2`, etc.)
 * `make getValuesFromApi key_1 key_2` - get values from redis via api
+![alt text](./testsCoverage.png)
 
 ## Documentation
 ### High-level architecture overview

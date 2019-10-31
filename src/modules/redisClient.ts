@@ -2,7 +2,6 @@ import * as redis from 'redis';
 import { RedisClient } from 'redis';
 import * as config from 'config';
 import logger from '../libs/logger';
-import { LruCache } from './lruCache';
 
 interface RedisConnectionOptions {
     database: string;
@@ -30,7 +29,6 @@ function connectToRedisBeforeCall(
 class Redis {
     private connection: RedisClient;
     connectData: RedisConnectionOptions;
-    private cache: LruCache<string>;
     constructor() {
         const opts = config.get<Omit<RedisConnectionOptions, 'port'> & { port: string }>('connections.redis');
         this.connectData = {
@@ -38,10 +36,6 @@ class Redis {
             host: opts.host,
             port: Number(opts.port),
         };
-        this.cache = new LruCache(
-          Number(config.get<string>('cache.capacity')),
-          Number(config.get<string>('cache.ttl')),
-        );
     }
 
     async connect(): Promise<RedisClient> {
@@ -61,7 +55,7 @@ class Redis {
                     }, database: ${this.connectData.database}`);
                 resolve(connection);
             });
-            connection.on('disconnect', () => {
+            connection.on('end', () => {
                 logger.info(`Disconnect from Redis: http://${this.connectData.host}:${this.connectData.port
                 }, database: ${this.connectData.database}`);
             });
@@ -70,15 +64,10 @@ class Redis {
 
     @connectToRedisBeforeCall
     async get(key: string): Promise<string> {
-        const resultFromCache = this.cache.get(key);
-        if (resultFromCache !== null) {
-          return resultFromCache;
-        }
         return new Promise((resolve, reject) => this.connection.get(key, (err, reply) => {
             if (err != null) {
                 return reject(err);
             }
-            this.cache.set(key, reply);
             resolve(reply)
         }));
     }
